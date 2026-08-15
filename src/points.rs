@@ -1,12 +1,13 @@
 use crate::DISP_SIZE;
 use crate::DrawItem;
 use crate::DrawPoint;
-
 use crate::parser::{eval, parser};
 use crate::transform::rotate_about_x;
 use crate::transform::rotate_about_z;
 use chumsky::prelude::*;
 use embedded_graphics::{pixelcolor::Rgb565, prelude::*};
+use std::io;
+use std::ptr::eq;
 
 pub struct Grid {}
 
@@ -16,18 +17,28 @@ pub struct Point3 {
     pub z: f32,
 }
 const GRID_SIZE: i32 = 100;
-const STEP: f32 = (10.0 / GRID_SIZE as f32);
+const STEP: f32 = 10.0 / GRID_SIZE as f32;
 pub fn generate_points() -> Vec<Vec<Point3>> {
     let mut diff_ps: Vec<Vec<Point3>> = Vec::new();
-    let graphs: Vec<&str> = vec![
-        "(30-x^2-y^2)^0.5",
-        "x^2+y^2",
-        "cos(x)*sin(y)",
-        "sin(x^2)+y^2",
-    ];
+    let mut graphs: Vec<String> = Vec::new();
+    let mut still_run = true;
+    while still_run {
+        let mut equation = String::new();
+        io::stdin()
+            .read_line(&mut equation)
+            .expect("failed to readline");
+        //println!("{}", equation);
+        let equation: String = equation.trim().to_string();
+        if equation == "!" || graphs.len() >= 5 {
+            // println!("trigger");
+            still_run = false;
+        } else {
+            graphs.push(equation);
+        }
+    }
 
     for src in graphs.iter() {
-        let ast = parser().parse(&src).into_result().unwrap();
+        let ast = parser().parse(&src.trim()).into_result().unwrap();
 
         let mut ps: Vec<Point3> = Vec::new();
         for i in -GRID_SIZE..GRID_SIZE {
@@ -48,7 +59,6 @@ pub fn generate_points() -> Vec<Vec<Point3>> {
 
 pub fn generate_screen_qs(
     diff_ps: &Vec<Vec<Point3>>,
-    rot: f64,
     phi_z: f64,
     phi_x: f64,
 ) -> (Vec<Vec<Point3>>, i32) {
@@ -121,10 +131,10 @@ pub fn send_to_display_points(
             let t = ((p1.z - z_min) / (z_max - z_min)).clamp(0.0, 1.0);
             let brightness = 0.2 + 0.8 * t;
 
-            let r = (colour[0] * brightness).clamp(0.0, 31.0) as u8;
+            let r = (colour[0] * brightness).clamp(0.0, 255.0) as u8;
 
-            let g = (colour[1] * brightness).clamp(0.0, 63.0) as u8;
-            let b = (colour[2] * brightness).clamp(0.0, 31.0) as u8;
+            let g = (colour[1] * brightness).clamp(0.0, 255.0) as u8;
+            let b = (colour[2] * brightness).clamp(0.0, 255.0) as u8;
 
             items.push(DrawPoint {
                 item: DrawItem::Line {

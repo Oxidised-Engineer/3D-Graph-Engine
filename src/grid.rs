@@ -5,7 +5,6 @@ use crate::{DISP_SIZE, DrawPoint};
 use embedded_graphics::pixelcolor::Rgb565;
 use embedded_graphics::prelude::*;
 
-use libm::{cos, sin};
 pub fn generate_initial_grid() -> Vec<Point3> {
     let mut grid: Vec<Point3> = Vec::new();
     let spacing = 3;
@@ -22,12 +21,7 @@ pub fn generate_initial_grid() -> Vec<Point3> {
     grid
 }
 
-pub fn send_to_display_grid(
-    grid: &Vec<Point3>,
-    rot: f64,
-    phi_z: f64,
-    phi_x: f64,
-) -> Vec<DrawPoint> {
+pub fn send_to_display_grid(grid: &Vec<Point3>, phi_z: f64, phi_x: f64) -> Vec<DrawPoint> {
     let mut items: Vec<DrawPoint> = Vec::new();
 
     let center_z = rotate_about_z(

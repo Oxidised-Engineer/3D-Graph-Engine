@@ -44,28 +44,28 @@ fn main() -> Result<(), std::convert::Infallible> {
 
     let ps: Vec<Vec<Point3>> = generate_points();
     let grid: Vec<Point3> = generate_initial_grid();
-    let rot: f64 = 30.0;
+
     let mut phi_z: f64 = 30.0;
     let mut phi_x: f64 = 30.0;
     let colours = vec![
-        vec![31.0, 31.0, 0.0],
+        vec![235.0, 135.0, 135.0],
         vec![0.0, 0.0, 31.0],
         vec![31.0, 63.0, 0.0],
-        vec![31.0, 0.0, 31.0],
         vec![0.0, 63.0, 31.0],
+        vec![31.0, 50.0, 29.0],
     ];
     'running: loop {
         let _ = display.clear(Rgb565::new(1, 1, 1));
         let compute_start = Instant::now();
 
-        let generated_screen_qs = generate_screen_qs(&ps, rot, phi_z, phi_x);
+        let generated_screen_qs = generate_screen_qs(&ps, phi_z, phi_x);
 
         let mut diff_qs: Vec<Vec<Point3>> = generated_screen_qs.0;
         let y_offset = generated_screen_qs.1;
 
         let mut items: Vec<Vec<DrawPoint>> = Vec::new();
 
-        items.push(send_to_display_grid(&grid, rot, phi_z, phi_x));
+        items.push(send_to_display_grid(&grid, phi_z, phi_x));
 
         let graph_items = send_to_display_points(&mut diff_qs, y_offset, &colours);
 
@@ -80,7 +80,7 @@ fn main() -> Result<(), std::convert::Infallible> {
         window.update(&display);
 
         let compute_time = compute_start.elapsed();
-        println!("{:?}", compute_time);
+        //println!("{:?}", compute_time);
         for e in window.events() {
             match e {
                 SimulatorEvent::Quit => {

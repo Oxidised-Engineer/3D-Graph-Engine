@@ -16,19 +16,6 @@ pub enum Expr<'src> {
     },
 }
 
-// pub fn to_parse() {
-//     //let src = "0.5*sin(x^y)+cos(x)";
-
-//     match parser().parse(&src).into_result() {
-//         Ok(ast) => match eval(&ast, 2.0, 4.0) {
-//             output => println!("{}", output),
-//         },
-//         Err(parse_errs) => parse_errs
-//             .into_iter()
-//             .for_each(|e| println!("Parse error: {}", e)),
-//     }
-// }
-
 pub fn parser<'src>() -> impl Parser<'src, &'src str, Expr<'src>> {
     let ident = text::ascii::ident().padded();
     let expr = recursive(|expr| {

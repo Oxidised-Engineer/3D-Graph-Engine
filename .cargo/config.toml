@@ -1,2 +1,6 @@
 [env]
 CMAKE_GENERATOR = "Ninja"
+[profile.dev]
+debug = "line-tables-only"
+[build]
+rustflags = ["-Z","threads=8"]
